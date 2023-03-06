@@ -1,8 +1,8 @@
 use clap::Parser;
 
-/// A simple CLI application using clap
+/// Migration toolkit for databases
 #[derive(Debug, Parser)]
-#[clap(name = "cli-clap")]
+#[clap(name = "crude")]
 struct App {
     #[clap(subcommand)]
     cmd: Subcommands,
