@@ -1,0 +1,5 @@
+name = "crude"
+description = "Migration toolkit for databases"
+repository = "termapps/crude"
+license = "MIT"
+homepage = "https://github.com/termapps/crude"
