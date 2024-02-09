@@ -9,8 +9,6 @@ use proc_exit::Code;
 
 #[derive(Debug, thiserror::Error)]
 pub enum Error {
-    #[error("You cannot use cliche")]
-    World,
     #[error("{0}")]
     Io(#[from] IoError),
 }
