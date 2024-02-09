@@ -1,5 +1,9 @@
 name = "crude"
+
 description = "Migration toolkit for databases"
-repository = "termapps/crude"
-license = "MIT"
-homepage = "https://github.com/termapps/crude"
+homepage    = "https://github.com/termapps/crude"
+license     = "MIT"
+repository  = "termapps/crude"
+
+[homebrew]
+repository = "termapps/homebrew-tap"
