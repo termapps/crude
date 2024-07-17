@@ -16,37 +16,54 @@
 <!-- omit from toc -->
 ## Getting started
 
-1. [Install](#install)
-2. [Usage](#usage)
+1. [Usage](#usage)
+2. [Install](#install)
 3. [Changelog](#changelog)
 
+## Usage
+
+<!-- publisher install start -->
 ## Install
 
-`crude` is available on Linux, macOS
+`crude` is available on Linux, macOS & Windows
 
 <!-- omit from toc -->
-### With [Homebrew](https://brew.sh/)
+#### With [Homebrew](https://brew.sh)
 
 ```
 $ brew install termapps/tap/crude
 ```
 
 <!-- omit from toc -->
-### With [cargo](https://crates.io/)
+#### With [AUR](https://aur.archlinux.org)
+
+```
+$ yay -S crude
+```
+
+<!-- omit from toc -->
+#### With [Scoop](https://scoop.sh)
+
+```
+$ scoop bucket add termapps https://github.com/termapps/scoop-bucket
+$ scoop install crude
+```
+
+<!-- omit from toc -->
+#### With [cargo](https://crates.io/)
 
 ```
 $ cargo install crude
 ```
 
 <!-- omit from toc -->
-### Direct
+#### Direct
 
-Pre-built binary executables are available at [releases page](https://github.com/termapps/crude/releases) for macOS (64bit), Linux (64bit, 32bit).
+Pre-built binary executables are available at [releases page](https://github.com/termapps/crude/releases).
 
-Download and unarchive the binary then put the executable in `$PATH`.
+Download, unarchive the binary, and then put the executable in `$PATH`.
 
-## Usage
-
+<!-- publisher install end -->
 <!-- omit from toc -->
 ## Contributors
 Here is a list of [Contributors](http://github.com/termapps/crude/contributors)

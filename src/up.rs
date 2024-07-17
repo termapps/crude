@@ -1,7 +1,7 @@
-use crate::error::Result;
-
 use clap::Parser;
 use tracing::instrument;
+
+use crate::error::Result;
 
 /// Apply all pending migrations
 #[derive(Debug, Parser)]

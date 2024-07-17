@@ -1,9 +1,12 @@
-name = "crude"
+repository = "termapps/crude"
 
-description = "Migration toolkit for databases"
-homepage    = "https://github.com/termapps/crude"
-license     = "MIT"
-repository  = "termapps/crude"
+exclude = ["aur"]
+
+[aur_bin]
+name = "crude"
 
 [homebrew]
 repository = "termapps/homebrew-tap"
+
+[scoop]
+repository = "termapps/scoop-bucket"

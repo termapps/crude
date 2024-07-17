@@ -1,5 +1,12 @@
 use std::io::stdout;
 
+use anstream::{AutoStream, ColorChoice};
+use clap::Parser;
+use clap_verbosity_flag::{InfoLevel, Verbosity};
+use colorchoice_clap::Color;
+use tracing_log::AsTrace;
+use tracing_subscriber::prelude::*;
+
 mod error;
 mod styles;
 
@@ -10,13 +17,6 @@ mod list;
 mod new;
 mod redo;
 mod up;
-
-use anstream::{AutoStream, ColorChoice};
-use clap::Parser;
-use clap_verbosity_flag::{InfoLevel, Verbosity};
-use colorchoice_clap::Color;
-use tracing_log::AsTrace;
-use tracing_subscriber::prelude::*;
 
 /// Migration toolkit for databases
 #[derive(Debug, Parser)]
