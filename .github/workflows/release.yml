@@ -58,7 +58,7 @@ jobs:
       fail-fast: false
       matrix:
         include:
-          - os: macos-latest
+          - os: macos-13
             target: x86_64-apple-darwin
           - os: macos-latest
             target: aarch64-apple-darwin
@@ -75,7 +75,7 @@ jobs:
     runs-on: ${{ matrix.os }}
     steps:
       - name: Install rust
-        uses: dtolnay/rust-toolchain@1.75.0
+        uses: dtolnay/rust-toolchain@1.79.0
         with:
           target: ${{ matrix.target }}
       - name: Install linker

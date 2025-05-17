@@ -2,11 +2,17 @@ repository = "termapps/crude"
 
 exclude = ["aur"]
 
-[aur_bin]
-name = "crude"
-
 [homebrew]
 repository = "termapps/homebrew-tap"
 
+[aur_bin]
+name = "crude"
+
 [scoop]
 repository = "termapps/scoop-bucket"
+
+[nix]
+repository = "termapps/nixpkgs"
+
+lockfile = false
+path     = "%n.nix"

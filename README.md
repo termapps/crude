@@ -28,32 +28,39 @@
 `crude` is available on Linux, macOS & Windows
 
 <!-- omit from toc -->
-#### With [Homebrew](https://brew.sh)
+#### With [Cargo](https://crates.io)
 
 ```
-$ brew install termapps/tap/crude
+cargo install crude
 ```
 
 <!-- omit from toc -->
-#### With [AUR](https://aur.archlinux.org)
+#### With [Homebrew](https://brew.sh)
 
 ```
-$ yay -S crude
+brew install termapps/tap/crude
+```
+
+<!-- omit from toc -->
+#### With [AUR (binary)](https://aur.archlinux.org)
+
+```
+yay -S crude
 ```
 
 <!-- omit from toc -->
 #### With [Scoop](https://scoop.sh)
 
 ```
-$ scoop bucket add termapps https://github.com/termapps/scoop-bucket
-$ scoop install crude
+scoop bucket add termapps https://github.com/termapps/scoop-bucket
+scoop install crude
 ```
 
 <!-- omit from toc -->
-#### With [cargo](https://crates.io/)
+#### With [Nix](https://nixos.org)
 
 ```
-$ cargo install crude
+nix profile install github:termapps/nixpkgs#crude
 ```
 
 <!-- omit from toc -->
