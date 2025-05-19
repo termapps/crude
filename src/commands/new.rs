@@ -1,7 +1,7 @@
 use clap::Parser;
 use tracing::instrument;
 
-use crate::error::Result;
+use crate::{error::Result, App};
 
 /// Create a new migration
 #[derive(Debug, Parser)]
@@ -12,7 +12,7 @@ pub struct New {
 
 impl New {
     #[instrument(name = "new", skip_all)]
-    pub fn run(self) -> Result {
+    pub fn run(&self, opts: &App) -> Result {
         Ok(())
     }
 }

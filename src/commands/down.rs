@@ -1,7 +1,7 @@
 use clap::Parser;
 use tracing::instrument;
 
-use crate::error::Result;
+use crate::{error::Result, App};
 
 /// Rollback the last migration
 #[derive(Debug, Parser)]
@@ -17,7 +17,7 @@ pub struct Down {
 
 impl Down {
     #[instrument(name = "down", skip_all)]
-    pub fn run(self) -> Result {
+    pub fn run(&self, opts: &App) -> Result {
         Ok(())
     }
 }

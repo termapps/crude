@@ -12,11 +12,7 @@ mod styles;
 
 mod utils;
 
-mod down;
-mod list;
-mod new;
-mod redo;
-mod up;
+mod commands;
 
 /// Migration toolkit for databases
 #[derive(Debug, Parser)]
@@ -24,22 +20,13 @@ mod up;
 #[command(styles = styles::styles())]
 struct App {
     #[command(subcommand)]
-    cmd: Subcommands,
+    cmd: commands::Subcommands,
 
     #[command(flatten)]
     color: Color,
 
     #[command(flatten)]
     verbose: Verbosity<InfoLevel>,
-}
-
-#[derive(Debug, Parser)]
-enum Subcommands {
-    List(list::List),
-    Up(up::Up),
-    Down(down::Down),
-    Redo(redo::Redo),
-    New(new::New),
 }
 
 fn main() {
@@ -57,13 +44,7 @@ fn main() {
         )
         .init();
 
-    let result = match program.cmd {
-        Subcommands::List(x) => x.run(),
-        Subcommands::Up(x) => x.run(),
-        Subcommands::Down(x) => x.run(),
-        Subcommands::Redo(x) => x.run(),
-        Subcommands::New(x) => x.run(),
-    };
+    let result = program.cmd.run(&program);
 
     error::finish(result);
 }
