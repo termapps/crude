@@ -27,6 +27,26 @@ struct App {
 
     #[command(flatten)]
     verbose: Verbosity<InfoLevel>,
+
+    #[command(flatten)]
+    options: Options,
+}
+
+#[derive(Debug, Parser)]
+#[clap(next_help_heading = "Global Options")]
+struct Options {
+    /// Database URL
+    #[arg(short, long, env = "DATABASE_URL")]
+    url: String,
+
+    /// Directory containing migration files
+    #[arg(
+        short = 'd',
+        long,
+        default_value = "./db/migrations",
+        env = "MIGRATIONS_DIR"
+    )]
+    migrations_dir: Option<String>,
 }
 
 fn main() {
