@@ -1,0 +1,38 @@
+use anstream::println;
+use clap::Parser;
+use tracing::instrument;
+
+use crate::{App, db::get_db_adapter, error::Result, migration::dir::get_migrations_dir};
+
+/// Verify a migration by applying up, down, then up again
+#[derive(Debug, Parser)]
+pub struct Verify {
+    /// The name of the migration
+    name: Option<String>,
+}
+
+impl Verify {
+    #[instrument(name = "verify", skip_all)]
+    pub fn run(&self, opts: &App) -> Result {
+        let migrations_dir = get_migrations_dir(opts);
+        let mut local = migrations_dir.load()?;
+
+        let mut db = get_db_adapter(opts)?;
+
+        if let Some(ref n) = self.name {
+            local.retain(|m| &m.compound_name == n);
+        }
+
+        for m in local {
+            println!("Verifying {}...", m.compound_name);
+
+            db.run_up_migration(&m)?;
+            db.run_down_migration(&m)?;
+            db.run_up_migration(&m)?;
+
+            println!(" OK");
+        }
+
+        Ok(())
+    }
+}

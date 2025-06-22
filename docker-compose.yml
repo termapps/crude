@@ -1,0 +1,12 @@
+networks:
+  default:
+    name: crude
+services:
+  postgres:
+    container_name: crude-postgres
+    image: postgres:alpine
+    ports:
+      - 5432:5432
+    environment:
+      POSTGRES_USER: app
+      POSTGRES_HOST_AUTH_METHOD: trust

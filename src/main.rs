@@ -6,10 +6,11 @@ use clap_verbosity_flag::{InfoLevel, Verbosity};
 use colorchoice_clap::Color;
 use tracing_subscriber::prelude::*;
 
+mod db;
+mod migration;
+
 mod error;
 mod styles;
-
-mod utils;
 
 mod commands;
 
@@ -38,7 +39,7 @@ struct Options {
     #[arg(short, long, env = "DATABASE_URL")]
     url: String,
 
-    /// Directory containing migration files
+    /// Directory containing migrations
     #[arg(
         short = 'd',
         long,
@@ -46,6 +47,10 @@ struct Options {
         env = "MIGRATIONS_DIR"
     )]
     migrations_dir: Option<String>,
+
+    /// File to dump the schema to
+    #[arg(short, long, env = "SCHEMA_FILE")]
+    schema: Option<String>,
 }
 
 fn main() {
