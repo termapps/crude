@@ -8,25 +8,20 @@ use crate::{
     migration::planner::{PlanOptions, Planner},
 };
 
-/// Apply all pending migrations
+/// Rollback all divergent and variant migrations, then apply all pending migrations
 #[derive(Debug, Parser)]
-pub struct Up {
-    /// Number of migrations to apply
-    #[clap(short, long)]
-    number: Option<usize>,
-
+pub struct Fix {
     #[clap(flatten)]
     plan_options: PlanOptions,
 }
 
-impl Up {
-    #[instrument(name = "up", skip_all)]
+impl Fix {
+    #[instrument(name = "fix", skip_all)]
     pub fn run(&self, opts: &App) -> Result {
         let mut db = get_db_adapter(opts)?;
 
         Planner::new(opts)?
-            .count(self.number)
-            .up(&mut db)?
+            .fix()?
             .run(&mut db, &self.plan_options)?;
 
         maybe_dump_schema(opts)?;
