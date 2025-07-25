@@ -51,7 +51,7 @@ impl Display for PlanStep {
 #[derive(Debug, Parser)]
 pub struct PlanOptions {
     /// Run seed.sql after applying migrations
-    #[clap(long)]
+    #[clap(long, env = "SEED")]
     pub seed: bool,
 
     /// Only show the migration plan without applying it
