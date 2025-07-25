@@ -328,6 +328,13 @@ impl Planner {
             .iter()
             .filter(|m| !self.ignore_divergent || self.local_map.contains_key(&m.compound_name))
             .cloned()
+            .map(|mut m| {
+                if let Some(local) = self.local_map.get(&m.compound_name) {
+                    m.down_sql = local.down_sql.clone().or(m.down_sql);
+                }
+
+                m
+            })
             .rev()
             .collect::<Vec<_>>();
 
@@ -362,8 +369,14 @@ impl Planner {
             .iter()
             .filter(|m| m.name != "init" && m.name != "rollup")
             .filter(|m| !self.ignore_divergent || self.local_map.contains_key(&m.compound_name))
-            .filter(|m| !self.ignore_unreversible || m.down_sql.is_some())
             .cloned()
+            .map(|mut m| {
+                if let Some(local) = self.local_map.get(&m.compound_name) {
+                    m.down_sql = local.down_sql.clone().or(m.down_sql);
+                }
+
+                m
+            })
             .collect::<Vec<_>>();
 
         let count = self.count.unwrap_or(applied.len());
@@ -419,7 +432,13 @@ impl Planner {
         let mut steps = Vec::new();
 
         // Get all db migrations from the index onwards
-        for m in self.remote.iter().skip(index).rev() {
+        for orig_m in self.remote.iter().skip(index).rev() {
+            let mut m = orig_m.clone();
+
+            if let Some(local) = self.local_map.get(&m.compound_name) {
+                m.down_sql = local.down_sql.clone().or(m.down_sql);
+            }
+
             if m.down_sql.is_none() {
                 return Err(eyre!(
                     "unable to rollback unreversible migration {}",
@@ -427,7 +446,7 @@ impl Planner {
                 ));
             }
 
-            steps.push(PlanStep::Down(m.clone()));
+            steps.push(PlanStep::Down(m));
         }
 
         // Apply pending migrations
