@@ -64,6 +64,13 @@ nix profile install github:termapps/nixpkgs#crude
 ```
 
 <!-- omit from toc -->
+#### With [NPM](https://npmjs.com)
+
+```
+npm install -g @termapps/crude
+```
+
+<!-- omit from toc -->
 #### Direct
 
 Pre-built binary executables are available at [releases page](https://github.com/termapps/crude/releases).
