@@ -19,7 +19,7 @@ impl Repair {
         let migrations_dir = get_migrations_dir(opts);
         let local = migrations_dir.load()?;
 
-        let mut db = get_db_adapter(opts)?;
+        let mut db = get_db_adapter(opts, false)?;
 
         let migration = local
             .into_iter()

@@ -17,7 +17,7 @@ impl Verify {
         let migrations_dir = get_migrations_dir(opts);
         let mut local = migrations_dir.load()?;
 
-        let mut db = get_db_adapter(opts)?;
+        let mut db = get_db_adapter(opts, true)?;
 
         if let Some(ref n) = self.name {
             local.retain(|m| &m.compound_name == n);

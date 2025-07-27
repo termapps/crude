@@ -118,7 +118,7 @@ impl Planner {
         let migrations_dir = get_migrations_dir(opts);
         let local = migrations_dir.load()?;
 
-        let mut db = get_db_adapter(opts)?;
+        let mut db = get_db_adapter(opts, false)?;
         let remote = db.load_migrations()?;
 
         let planner = Self {
