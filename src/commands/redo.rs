@@ -34,7 +34,7 @@ pub struct Redo {
 impl Redo {
     #[instrument(name = "redo", skip_all)]
     pub fn run(&self, opts: &App) -> Result {
-        let mut db = get_db_adapter(opts)?;
+        let mut db = get_db_adapter(opts, false)?;
 
         Planner::new(opts)?
             .set_ignore_divergent(self.ignore_divergent)

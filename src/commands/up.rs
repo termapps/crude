@@ -22,7 +22,7 @@ pub struct Up {
 impl Up {
     #[instrument(name = "up", skip_all)]
     pub fn run(&self, opts: &App) -> Result {
-        let mut db = get_db_adapter(opts)?;
+        let mut db = get_db_adapter(opts, true)?;
 
         Planner::new(opts)?
             .count(self.number)

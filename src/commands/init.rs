@@ -22,7 +22,7 @@ impl Init {
 
         migrations_dir.create()?;
 
-        let mut db = get_db_adapter(opts)?;
+        let mut db = get_db_adapter(opts, true)?;
         let up_sql = db.init_up_sql();
 
         let compound_name = String::from("20000101000000_init");

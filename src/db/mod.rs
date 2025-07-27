@@ -1,9 +1,9 @@
-use std::{fs::write, process::Command};
+use std::{fs::write, process::Command, thread::sleep, time::Duration};
 
 use ::postgres::{Client, NoTls};
 use eyre::eyre;
 use rusqlite::Connection;
-use tracing::debug;
+use tracing::{debug, trace};
 
 use crate::{App, error::Result, migration::Migration};
 
@@ -38,11 +38,27 @@ pub trait DatabaseAdapter {
 }
 
 /// Build a boxed DatabaseAdapter (Postgres or SQLite) based on the URL.
-pub fn get_db_adapter(opts: &App) -> Result<Box<dyn DatabaseAdapter>> {
+pub fn get_db_adapter(opts: &App, wait: bool) -> Result<Box<dyn DatabaseAdapter>> {
     let url = &opts.options.url;
 
     if url.starts_with("postgres://") || url.starts_with("postgresql://") {
-        let client = Client::connect(url, NoTls)?;
+        let mut attempts = 0;
+
+        let client = loop {
+            match Client::connect(url, NoTls) {
+                Ok(client) => break client,
+                Err(err) => {
+                    attempts += 1;
+
+                    if !wait || attempts > 60 {
+                        return Err(err.into());
+                    }
+
+                    trace!("failed to connect to postgres, retrying...");
+                    sleep(Duration::from_secs(1));
+                }
+            }
+        };
 
         Ok(Box::new(PostgresAdapter::new(client)))
     } else if url.starts_with("sqlite://") {

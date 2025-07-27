@@ -35,7 +35,7 @@ pub struct Down {
 impl Down {
     #[instrument(name = "down", skip_all)]
     pub fn run(&self, opts: &App) -> Result {
-        let mut db = get_db_adapter(opts)?;
+        let mut db = get_db_adapter(opts, false)?;
 
         Planner::new(opts)?
             .set_ignore_divergent(self.ignore_divergent)

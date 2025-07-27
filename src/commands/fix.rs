@@ -18,7 +18,7 @@ pub struct Fix {
 impl Fix {
     #[instrument(name = "fix", skip_all)]
     pub fn run(&self, opts: &App) -> Result {
-        let mut db = get_db_adapter(opts)?;
+        let mut db = get_db_adapter(opts, false)?;
 
         Planner::new(opts)?
             .fix()?
