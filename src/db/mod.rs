@@ -2,6 +2,8 @@ use std::{fs::write, process::Command, thread::sleep, time::Duration};
 
 use ::postgres::{Client, NoTls};
 use eyre::eyre;
+use native_tls::TlsConnector;
+use postgres_native_tls::MakeTlsConnector;
 use rusqlite::Connection;
 use tracing::{debug, trace};
 
@@ -44,8 +46,16 @@ pub fn get_db_adapter(opts: &App, wait: bool) -> Result<Box<dyn DatabaseAdapter>
     if url.starts_with("postgres://") || url.starts_with("postgresql://") {
         let mut attempts = 0;
 
+        let tls = MakeTlsConnector::new(TlsConnector::builder().build()?);
+
         let client = loop {
-            match Client::connect(url, NoTls) {
+            let client = if url.contains("sslmode=require") {
+                Client::connect(url, tls.clone())
+            } else {
+                Client::connect(url, NoTls)
+            };
+
+            match client {
                 Ok(client) => break client,
                 Err(err) => {
                     attempts += 1;

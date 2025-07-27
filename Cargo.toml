@@ -1,6 +1,6 @@
 [package]
 name    = "crude"
-version = "0.1.1"
+version = "0.1.2"
 
 authors     = ["Pavan Kumar Sunkara <pavan.sss1991@gmail.com>"]
 description = "Migration toolkit for databases"
@@ -26,13 +26,15 @@ tracing             = "0.1.41"
 tracing-log         = { version = "0.2.0", default-features = false, features = ["log-tracer", "std"] }
 tracing-subscriber  = "0.3.19"
 
-chrono   = "0.4"
-hex      = "0.4"
-postgres = "0.19"
-regex    = "1.9.0"
-rusqlite = { version = "0.28", features = ["bundled", "chrono"] }
-sha2     = "0.10"
-tempfile = "3.3"
+chrono              = "0.4"
+hex                 = "0.4"
+native-tls          = { version = "0.2.14", features = ["vendored"] }
+postgres            = { version = "0.19.7", default-features = false, features = ["with-chrono-0_4"] }
+postgres-native-tls = "0.5.1"
+regex               = "1.9.0"
+rusqlite            = { version = "0.28", features = ["bundled", "chrono"] }
+sha2                = "0.10"
+tempfile            = "3.3"
 
 [[bin]]
 name = "crude"
