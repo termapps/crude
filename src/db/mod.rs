@@ -1,4 +1,4 @@
-use std::{fs::write, process::Command, thread::sleep, time::Duration};
+use std::{thread::sleep, time::Duration};
 
 use ::postgres::{Client, NoTls};
 use eyre::eyre;
@@ -37,6 +37,9 @@ pub trait DatabaseAdapter {
 
     /// Record a baseline migration in the tracking table without executing its SQL.
     fn record_baseline(&mut self, name: &str, hash: &str) -> Result<()>;
+
+    /// Dump the database schema to a file.
+    fn dump_schema(&self, url: &str, path: &str) -> Result<()>;
 }
 
 /// Build a boxed DatabaseAdapter (Postgres or SQLite) based on the URL.
@@ -83,24 +86,8 @@ pub fn get_db_adapter(opts: &App, wait: bool) -> Result<Box<dyn DatabaseAdapter>
 /// If the user specified a schema file, dump to it
 pub fn maybe_dump_schema(opts: &App) -> Result<()> {
     if let Some(path) = &opts.options.schema {
-        let url = &opts.options.url;
-
-        if url.starts_with("postgres://") || url.starts_with("postgresql://") {
-            // Use external pg_dump for schema-only dump
-            let output = Command::new("pg_dump")
-                .arg("--schema-only")
-                .arg("--no-owner")
-                .arg("--no-privileges")
-                .arg(format!("--dbname={url}"))
-                .output()?;
-
-            write(path, &output.stdout)?;
-        } else if url.starts_with("sqlite://") {
-            // SQLite schema via sqlite3 .schema
-            let output = Command::new("sqlite3").arg(url).arg(".schema").output()?;
-
-            write(path, &output.stdout)?;
-        }
+        let adapter = get_db_adapter(opts, false)?;
+        adapter.dump_schema(&opts.options.url, path)?;
 
         debug!("schema dumped to {path}");
     }

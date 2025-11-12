@@ -1,3 +1,5 @@
+use std::{fs::write, process::Command};
+
 use postgres::Client;
 
 use crate::{db::DatabaseAdapter, error::Result, migration::Migration};
@@ -138,6 +140,20 @@ impl DatabaseAdapter for PostgresAdapter {
             "INSERT INTO crude.migrations (name, hash) VALUES ($1, $2)",
             &[&name, &hash],
         )?;
+
+        Ok(())
+    }
+
+    fn dump_schema(&self, url: &str, path: &str) -> Result<()> {
+        // Use external pg_dump for schema-only dump
+        let output = Command::new("pg_dump")
+            .arg("--schema-only")
+            .arg("--no-owner")
+            .arg("--no-privileges")
+            .arg(format!("--dbname={url}"))
+            .output()?;
+
+        write(path, &output.stdout)?;
 
         Ok(())
     }

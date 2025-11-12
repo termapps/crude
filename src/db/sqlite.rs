@@ -1,3 +1,5 @@
+use std::{fs::write, process::Command};
+
 use rusqlite::{Connection, params};
 
 use crate::{db::DatabaseAdapter, error::Result, migration::Migration};
@@ -148,6 +150,15 @@ impl DatabaseAdapter for SqliteAdapter {
             "INSERT INTO crude_migrations (name, hash) VALUES (?1, ?2)",
             params![name, hash],
         )?;
+
+        Ok(())
+    }
+
+    fn dump_schema(&self, url: &str, path: &str) -> Result<()> {
+        // SQLite schema via sqlite3 .schema
+        let output = Command::new("sqlite3").arg(url).arg(".schema").output()?;
+
+        write(path, &output.stdout)?;
 
         Ok(())
     }
