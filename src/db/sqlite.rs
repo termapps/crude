@@ -1,4 +1,4 @@
-use std::{fs::write, process::Command};
+use std::process::Command;
 
 use rusqlite::{Connection, params};
 
@@ -154,13 +154,11 @@ impl DatabaseAdapter for SqliteAdapter {
         Ok(())
     }
 
-    fn dump_schema(&self, url: &str, path: &str) -> Result<()> {
+    fn dump_schema(&mut self, url: &str) -> Result<Vec<u8>> {
         // SQLite schema via sqlite3 .schema
         let output = Command::new("sqlite3").arg(url).arg(".schema").output()?;
 
-        write(path, &output.stdout)?;
-
-        Ok(())
+        Ok(output.stdout)
     }
 }
 

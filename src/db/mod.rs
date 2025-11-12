@@ -1,4 +1,4 @@
-use std::{thread::sleep, time::Duration};
+use std::{fs::write, thread::sleep, time::Duration};
 
 use ::postgres::{Client, NoTls};
 use eyre::eyre;
@@ -38,8 +38,8 @@ pub trait DatabaseAdapter {
     /// Record a baseline migration in the tracking table without executing its SQL.
     fn record_baseline(&mut self, name: &str, hash: &str) -> Result<()>;
 
-    /// Dump the database schema to a file.
-    fn dump_schema(&self, url: &str, path: &str) -> Result<()>;
+    /// Dump the database schema and return the output.
+    fn dump_schema(&mut self, url: &str) -> Result<Vec<u8>>;
 }
 
 /// Build a boxed DatabaseAdapter (Postgres or SQLite) based on the URL.
@@ -84,10 +84,10 @@ pub fn get_db_adapter(opts: &App, wait: bool) -> Result<Box<dyn DatabaseAdapter>
 }
 
 /// If the user specified a schema file, dump to it
-pub fn maybe_dump_schema(opts: &App) -> Result<()> {
+pub fn maybe_dump_schema(db: &mut Box<dyn DatabaseAdapter>, opts: &App) -> Result<()> {
     if let Some(path) = &opts.options.schema {
-        let adapter = get_db_adapter(opts, false)?;
-        adapter.dump_schema(&opts.options.url, path)?;
+        let schema = db.dump_schema(&opts.options.url)?;
+        write(path, &schema)?;
 
         debug!("schema dumped to {path}");
     }

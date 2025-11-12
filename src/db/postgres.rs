@@ -1,4 +1,4 @@
-use std::{fs::write, process::Command};
+use std::process::Command;
 
 use postgres::Client;
 
@@ -144,7 +144,7 @@ impl DatabaseAdapter for PostgresAdapter {
         Ok(())
     }
 
-    fn dump_schema(&self, url: &str, path: &str) -> Result<()> {
+    fn dump_schema(&mut self, url: &str) -> Result<Vec<u8>> {
         // Use external pg_dump for schema-only dump
         let output = Command::new("pg_dump")
             .arg("--schema-only")
@@ -153,9 +153,7 @@ impl DatabaseAdapter for PostgresAdapter {
             .arg(format!("--dbname={url}"))
             .output()?;
 
-        write(path, &output.stdout)?;
-
-        Ok(())
+        Ok(output.stdout)
     }
 }
 
