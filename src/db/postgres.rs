@@ -1,3 +1,5 @@
+use std::process::Command;
+
 use postgres::Client;
 
 use crate::{db::DatabaseAdapter, error::Result, migration::Migration};
@@ -140,6 +142,18 @@ impl DatabaseAdapter for PostgresAdapter {
         )?;
 
         Ok(())
+    }
+
+    fn dump_schema(&mut self, url: &str) -> Result<Vec<u8>> {
+        // Use external pg_dump for schema-only dump
+        let output = Command::new("pg_dump")
+            .arg("--schema-only")
+            .arg("--no-owner")
+            .arg("--no-privileges")
+            .arg(format!("--dbname={url}"))
+            .output()?;
+
+        Ok(output.stdout)
     }
 }
 

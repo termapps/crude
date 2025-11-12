@@ -50,7 +50,7 @@ impl Down {
                 },
             )?;
 
-        maybe_dump_schema(opts)?;
+        maybe_dump_schema(&mut db, opts)?;
 
         Ok(())
     }

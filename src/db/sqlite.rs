@@ -1,3 +1,5 @@
+use std::process::Command;
+
 use rusqlite::{Connection, params};
 
 use crate::{db::DatabaseAdapter, error::Result, migration::Migration};
@@ -150,6 +152,13 @@ impl DatabaseAdapter for SqliteAdapter {
         )?;
 
         Ok(())
+    }
+
+    fn dump_schema(&mut self, url: &str) -> Result<Vec<u8>> {
+        // SQLite schema via sqlite3 .schema
+        let output = Command::new("sqlite3").arg(url).arg(".schema").output()?;
+
+        Ok(output.stdout)
     }
 }
 

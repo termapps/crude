@@ -29,7 +29,7 @@ impl Up {
             .up(&mut db)?
             .run(&mut db, &self.plan_options)?;
 
-        maybe_dump_schema(opts)?;
+        maybe_dump_schema(&mut db, opts)?;
 
         Ok(())
     }
