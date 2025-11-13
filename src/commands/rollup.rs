@@ -9,7 +9,7 @@ use sha2::{Digest, Sha256};
 use tracing::instrument;
 
 use crate::{
-    App,
+    Options,
     db::get_db_adapter,
     error::Result,
     migration::{
@@ -24,7 +24,7 @@ pub struct Rollup {}
 
 impl Rollup {
     #[instrument(name = "rollup", skip_all)]
-    pub(crate) fn run(&self, opts: &App) -> Result {
+    pub(crate) fn run(&self, opts: &Options) -> Result {
         let migrations_dir = get_migrations_dir(opts);
         let local = migrations_dir.load()?;
 
@@ -41,7 +41,7 @@ impl Rollup {
             ));
         }
 
-        let url = &opts.options.url;
+        let url = &opts.url;
 
         // Dump current schema excluding the migrations table
         let up_sql = if url.starts_with("postgres://") || url.starts_with("postgresql://") {

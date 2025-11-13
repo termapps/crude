@@ -10,7 +10,7 @@ use eyre::eyre;
 use owo_colors::OwoColorize;
 
 use crate::{
-    App,
+    Options,
     db::{DatabaseAdapter, get_db_adapter},
     error::Result,
     migration::{Migration, dir::get_migrations_dir},
@@ -114,7 +114,7 @@ pub struct Planner {
 
 impl Planner {
     /// Start a new plan builder.
-    pub fn new(opts: &App) -> Result<Self> {
+    pub fn new(opts: &Options) -> Result<Self> {
         let migrations_dir = get_migrations_dir(opts);
         let local = migrations_dir.load()?;
 

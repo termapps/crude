@@ -55,7 +55,7 @@ pub struct Options {
 
 impl App {
     pub fn run(self) -> Result {
-        self.cmd.run(&self)
+        self.cmd.run(&self.options)
     }
 
     pub fn new(cmd: Subcommands, options: Options) -> Self {
