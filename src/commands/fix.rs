@@ -2,7 +2,7 @@ use clap::Parser;
 use tracing::instrument;
 
 use crate::{
-    App,
+    Options,
     db::{get_db_adapter, maybe_dump_schema},
     error::Result,
     migration::planner::{PlanOptions, Planner},
@@ -17,7 +17,7 @@ pub struct Fix {
 
 impl Fix {
     #[instrument(name = "fix", skip_all)]
-    pub(crate) fn run(&self, opts: &App) -> Result {
+    pub(crate) fn run(&self, opts: &Options) -> Result {
         let mut db = get_db_adapter(opts, false)?;
 
         Planner::new(opts)?

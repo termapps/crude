@@ -5,7 +5,7 @@ use eyre::eyre;
 use owo_colors::OwoColorize;
 use tracing::instrument;
 
-use crate::{App, error::Result, migration::dir::get_migrations_dir};
+use crate::{Options, error::Result, migration::dir::get_migrations_dir};
 
 /// Regenerate the timestamp of a migration
 #[derive(Debug, Parser)]
@@ -16,7 +16,7 @@ pub struct Retime {
 
 impl Retime {
     #[instrument(name = "retime", skip_all)]
-    pub(crate) fn run(&self, opts: &App) -> Result {
+    pub(crate) fn run(&self, opts: &Options) -> Result {
         let migrations_dir = get_migrations_dir(opts);
         let local = migrations_dir.load()?;
 

@@ -6,7 +6,7 @@ use std::{
 
 use eyre::eyre;
 
-use crate::{App, error::Result, migration::Migration};
+use crate::{Options, error::Result, migration::Migration};
 
 /// Manages filesystem operations for local migrations.
 pub struct MigrationsDir {
@@ -110,12 +110,8 @@ impl MigrationsDir {
 }
 
 /// Build a MigrationsDir from CLI options.
-pub fn get_migrations_dir(opts: &App) -> MigrationsDir {
-    let dir = opts
-        .options
-        .migrations_dir
-        .as_deref()
-        .unwrap_or("./db/migrations");
+pub fn get_migrations_dir(opts: &Options) -> MigrationsDir {
+    let dir = opts.migrations_dir.as_deref().unwrap_or("./db/migrations");
 
     MigrationsDir::new(dir)
 }

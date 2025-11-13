@@ -1,6 +1,6 @@
 use clap::Parser;
 
-use crate::{App, error::Result};
+use crate::{Options, error::Result};
 
 pub mod down;
 pub mod fix;
@@ -31,7 +31,7 @@ pub enum Subcommands {
 }
 
 impl Subcommands {
-    pub(crate) fn run(&self, opts: &App) -> Result {
+    pub(crate) fn run(&self, opts: &Options) -> Result {
         match self {
             Self::Init(x) => x.run(opts),
             Self::New(x) => x.run(opts),

@@ -2,7 +2,7 @@ use clap::Parser;
 use tracing::{debug, instrument};
 
 use crate::{
-    App,
+    Options,
     db::{get_db_adapter, maybe_dump_schema},
     error::Result,
     migration::{
@@ -17,7 +17,7 @@ pub struct Init {}
 
 impl Init {
     #[instrument(name = "init", skip_all)]
-    pub(crate) fn run(&self, opts: &App) -> Result {
+    pub(crate) fn run(&self, opts: &Options) -> Result {
         let migrations_dir = get_migrations_dir(opts);
 
         migrations_dir.create()?;

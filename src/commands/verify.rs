@@ -2,7 +2,7 @@ use anstream::println;
 use clap::Parser;
 use tracing::instrument;
 
-use crate::{App, db::get_db_adapter, error::Result, migration::dir::get_migrations_dir};
+use crate::{Options, db::get_db_adapter, error::Result, migration::dir::get_migrations_dir};
 
 /// Verify a migration by applying up, down, then up again
 #[derive(Debug, Parser)]
@@ -13,7 +13,7 @@ pub struct Verify {
 
 impl Verify {
     #[instrument(name = "verify", skip_all)]
-    pub(crate) fn run(&self, opts: &App) -> Result {
+    pub(crate) fn run(&self, opts: &Options) -> Result {
         let migrations_dir = get_migrations_dir(opts);
         let mut local = migrations_dir.load()?;
 
