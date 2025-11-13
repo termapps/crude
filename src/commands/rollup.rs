@@ -41,7 +41,7 @@ impl Rollup {
             ));
         }
 
-        let url = &opts.url;
+        let url = opts.get_url()?;
 
         // Dump current schema excluding the migrations table
         let up_sql = if url.starts_with("postgres://") || url.starts_with("postgresql://") {

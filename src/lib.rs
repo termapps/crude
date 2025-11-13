@@ -1,8 +1,14 @@
+use anstream::eprintln;
 use clap::Parser;
 use clap_verbosity_flag::{InfoLevel, Verbosity};
 use colorchoice_clap::Color;
+use owo_colors::OwoColorize;
+use proc_exit::Code;
 
-use crate::{commands::Subcommands, error::Result};
+use crate::{
+    commands::Subcommands,
+    error::{Result, exit},
+};
 
 mod db;
 mod migration;
@@ -37,7 +43,7 @@ pub struct App {
 pub struct Options {
     /// Database URL
     #[arg(short, long, env = "DATABASE_URL")]
-    pub url: String,
+    pub url: Option<String>,
 
     /// Directory containing migrations
     #[arg(
@@ -65,6 +71,27 @@ impl App {
             verbose: Verbosity::default(),
             options,
         }
+    }
+}
+
+impl Options {
+    /// Get the database URL or error out if not provided
+    pub fn get_url(&self) -> Result<&str> {
+        if let Some(url) = self.url.as_ref() {
+            return Ok(url);
+        }
+
+        eprintln!(
+            "{} the following required arguments were not provided:\n  {}\n\n{} {}{}\n\nFor more information, try '{}'.",
+            "error:".red().bold(),
+            "--url <URL>".green(),
+            "Usage:".yellow(),
+            "crude --url ".green(),
+            "<URL> <COMMAND>".cyan(),
+            "--help".green(),
+        );
+
+        exit(Code::FAILURE);
     }
 }
 
