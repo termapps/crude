@@ -37,7 +37,7 @@ pub struct App {
 pub struct Options {
     /// Database URL
     #[arg(short, long, env = "DATABASE_URL")]
-    pub url: String,
+    pub url: Option<String>,
 
     /// Directory containing migrations
     #[arg(

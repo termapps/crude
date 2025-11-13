@@ -41,7 +41,9 @@ impl Rollup {
             ));
         }
 
-        let url = &opts.url;
+        let url = opts.url.as_ref().ok_or_else(|| {
+            eyre!("Database URL is required for rollup command. Please provide it via --url or DATABASE_URL environment variable")
+        })?;
 
         // Dump current schema excluding the migrations table
         let up_sql = if url.starts_with("postgres://") || url.starts_with("postgresql://") {
