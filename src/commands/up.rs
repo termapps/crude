@@ -13,15 +13,15 @@ use crate::{
 pub struct Up {
     /// Number of migrations to apply
     #[clap(short, long)]
-    number: Option<usize>,
+    pub number: Option<usize>,
 
     #[clap(flatten)]
-    plan_options: PlanOptions,
+    pub plan_options: PlanOptions,
 }
 
 impl Up {
     #[instrument(name = "up", skip_all)]
-    pub fn run(&self, opts: &App) -> Result {
+    pub(crate) fn run(&self, opts: &App) -> Result {
         let mut db = get_db_adapter(opts, true)?;
 
         Planner::new(opts)?

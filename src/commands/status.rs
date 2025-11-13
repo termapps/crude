@@ -13,7 +13,7 @@ pub struct Status {}
 
 impl Status {
     #[instrument(name = "status", skip_all)]
-    pub fn run(&self, opts: &App) -> Result {
+    pub(crate) fn run(&self, opts: &App) -> Result {
         let status = Planner::new(opts)?.status()?;
 
         print_status(&status);

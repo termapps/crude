@@ -12,12 +12,12 @@ use crate::{
 #[derive(Debug, Parser)]
 pub struct Fix {
     #[clap(flatten)]
-    plan_options: PlanOptions,
+    pub plan_options: PlanOptions,
 }
 
 impl Fix {
     #[instrument(name = "fix", skip_all)]
-    pub fn run(&self, opts: &App) -> Result {
+    pub(crate) fn run(&self, opts: &App) -> Result {
         let mut db = get_db_adapter(opts, false)?;
 
         Planner::new(opts)?

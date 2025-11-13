@@ -17,7 +17,7 @@ pub struct Init {}
 
 impl Init {
     #[instrument(name = "init", skip_all)]
-    pub fn run(&self, opts: &App) -> Result {
+    pub(crate) fn run(&self, opts: &App) -> Result {
         let migrations_dir = get_migrations_dir(opts);
 
         migrations_dir.create()?;

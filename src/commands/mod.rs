@@ -2,17 +2,17 @@ use clap::Parser;
 
 use crate::{App, error::Result};
 
-mod down;
-mod fix;
-mod init;
-mod new;
-mod redo;
-mod repair;
-mod retime;
-mod rollup;
-mod status;
-mod up;
-mod verify;
+pub mod down;
+pub mod fix;
+pub mod init;
+pub mod new;
+pub mod redo;
+pub mod repair;
+pub mod retime;
+pub mod rollup;
+pub mod status;
+pub mod up;
+pub mod verify;
 
 #[derive(Debug, Parser)]
 pub enum Subcommands {
@@ -31,7 +31,7 @@ pub enum Subcommands {
 }
 
 impl Subcommands {
-    pub fn run(&self, opts: &App) -> Result {
+    pub(crate) fn run(&self, opts: &App) -> Result {
         match self {
             Self::Init(x) => x.run(opts),
             Self::New(x) => x.run(opts),

@@ -80,7 +80,7 @@ Download, unarchive the binary, and then put the executable in `$PATH`.
 <!-- publisher install end -->
 <!-- omit from toc -->
 ## Contributors
-Here is a list of [Contributors](http://github.com/termapps/crude/contributors)
+Here is a list of [Contributors](https://github.com/termapps/crude/contributors)
 
 <!-- omit from toc -->
 ### TODO
@@ -94,7 +94,7 @@ MIT/X11
 
 <!-- omit from toc -->
 ## Bug Reports
-Report [here](http://github.com/termapps/crude/issues).
+Report [here](https://github.com/termapps/crude/issues).
 
 <!-- omit from toc -->
 ## Creator

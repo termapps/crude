@@ -10,12 +10,12 @@ use crate::{App, db::get_db_adapter, error::Result, migration::dir::get_migratio
 #[derive(Debug, Parser)]
 pub struct Repair {
     /// The name of the migration
-    name: String,
+    pub name: String,
 }
 
 impl Repair {
     #[instrument(name = "repair", skip_all)]
-    pub fn run(&self, opts: &App) -> Result {
+    pub(crate) fn run(&self, opts: &App) -> Result {
         let migrations_dir = get_migrations_dir(opts);
         let local = migrations_dir.load()?;
 

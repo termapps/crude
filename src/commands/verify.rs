@@ -8,12 +8,12 @@ use crate::{App, db::get_db_adapter, error::Result, migration::dir::get_migratio
 #[derive(Debug, Parser)]
 pub struct Verify {
     /// The name of the migration
-    name: Option<String>,
+    pub name: Option<String>,
 }
 
 impl Verify {
     #[instrument(name = "verify", skip_all)]
-    pub fn run(&self, opts: &App) -> Result {
+    pub(crate) fn run(&self, opts: &App) -> Result {
         let migrations_dir = get_migrations_dir(opts);
         let mut local = migrations_dir.load()?;
 

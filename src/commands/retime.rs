@@ -11,12 +11,12 @@ use crate::{App, error::Result, migration::dir::get_migrations_dir};
 #[derive(Debug, Parser)]
 pub struct Retime {
     /// The name of the migration
-    name: String,
+    pub name: String,
 }
 
 impl Retime {
     #[instrument(name = "retime", skip_all)]
-    pub fn run(&self, opts: &App) -> Result {
+    pub(crate) fn run(&self, opts: &App) -> Result {
         let migrations_dir = get_migrations_dir(opts);
         let local = migrations_dir.load()?;
 

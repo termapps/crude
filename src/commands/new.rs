@@ -11,12 +11,12 @@ use crate::{App, error::Result, migration::dir::get_migrations_dir};
 #[derive(Debug, Parser)]
 pub struct New {
     /// The name of the migration
-    name: String,
+    pub name: String,
 }
 
 impl New {
     #[instrument(name = "new", skip_all)]
-    pub fn run(&self, opts: &App) -> Result {
+    pub(crate) fn run(&self, opts: &App) -> Result {
         let migrations_dir = get_migrations_dir(opts);
 
         migrations_dir.check()?;

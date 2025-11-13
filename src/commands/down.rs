@@ -13,28 +13,28 @@ use crate::{
 pub struct Down {
     /// Number of migrations to rollback
     #[clap(short, long, default_value_t = 1, conflicts_with = "all")]
-    number: usize,
+    pub number: usize,
 
     /// Rollback all applied migrations
     #[clap(short, long)]
-    all: bool,
+    pub all: bool,
 
     /// Only show the migration plan without rolling back
     #[clap(short, long)]
-    plan_only: bool,
+    pub plan_only: bool,
 
     /// Ignore divergent migrations
     #[clap(long)]
-    ignore_divergent: bool,
+    pub ignore_divergent: bool,
 
     /// Ignore unreversible migrations
     #[clap(long)]
-    ignore_unreversible: bool,
+    pub ignore_unreversible: bool,
 }
 
 impl Down {
     #[instrument(name = "down", skip_all)]
-    pub fn run(&self, opts: &App) -> Result {
+    pub(crate) fn run(&self, opts: &App) -> Result {
         let mut db = get_db_adapter(opts, false)?;
 
         Planner::new(opts)?

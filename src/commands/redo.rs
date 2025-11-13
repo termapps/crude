@@ -13,27 +13,27 @@ use crate::{
 pub struct Redo {
     /// Number of migrations to redo
     #[clap(short, long, default_value_t = 1, conflicts_with = "all")]
-    number: usize,
+    pub number: usize,
 
     /// Redo all applied migrations
     #[clap(short, long)]
-    all: bool,
+    pub all: bool,
 
     #[clap(flatten)]
-    plan_options: PlanOptions,
+    pub plan_options: PlanOptions,
 
     /// Ignore divergent migrations
     #[clap(long)]
-    ignore_divergent: bool,
+    pub ignore_divergent: bool,
 
     /// Ignore unreversible migrations
     #[clap(long)]
-    ignore_unreversible: bool,
+    pub ignore_unreversible: bool,
 }
 
 impl Redo {
     #[instrument(name = "redo", skip_all)]
-    pub fn run(&self, opts: &App) -> Result {
+    pub(crate) fn run(&self, opts: &App) -> Result {
         let mut db = get_db_adapter(opts, false)?;
 
         Planner::new(opts)?

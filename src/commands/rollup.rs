@@ -24,7 +24,7 @@ pub struct Rollup {}
 
 impl Rollup {
     #[instrument(name = "rollup", skip_all)]
-    pub fn run(&self, opts: &App) -> Result {
+    pub(crate) fn run(&self, opts: &App) -> Result {
         let migrations_dir = get_migrations_dir(opts);
         let local = migrations_dir.load()?;
 
