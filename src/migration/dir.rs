@@ -54,6 +54,8 @@ impl MigrationsDir {
 
     /// Load local migrations from subdirectories (sorted by name).
     pub fn load(&self) -> Result<Vec<Migration>> {
+        self.check()?;
+
         let mut migrations = Vec::new();
 
         let mut dirs = read_dir(&self.dir)?

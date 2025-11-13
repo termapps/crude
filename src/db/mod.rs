@@ -44,9 +44,7 @@ pub trait DatabaseAdapter {
 
 /// Build a boxed DatabaseAdapter (Postgres or SQLite) based on the URL.
 pub fn get_db_adapter(opts: &Options, wait: bool) -> Result<Box<dyn DatabaseAdapter>> {
-    let url = opts.url.as_ref().ok_or_else(|| {
-        eyre!("Database URL is required for this command. Please provide it via --url or DATABASE_URL environment variable")
-    })?;
+    let url = opts.get_url()?;
 
     if url.starts_with("postgres://") || url.starts_with("postgresql://") {
         let mut attempts = 0;
@@ -88,10 +86,9 @@ pub fn get_db_adapter(opts: &Options, wait: bool) -> Result<Box<dyn DatabaseAdap
 /// If the user specified a schema file, dump to it
 pub fn maybe_dump_schema(db: &mut Box<dyn DatabaseAdapter>, opts: &Options) -> Result<()> {
     if let Some(path) = &opts.schema {
-        let url = opts.url.as_ref().ok_or_else(|| {
-            eyre!("Database URL is required when using schema dump option")
-        })?;
+        let url = opts.get_url()?;
         let schema = db.dump_schema(url)?;
+
         write(path, &schema)?;
 
         debug!("schema dumped to {path}");
