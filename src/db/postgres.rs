@@ -1,6 +1,8 @@
 use std::process::Command;
 
 use postgres::Client;
+use regex::Regex;
+use tracing::warn;
 
 use crate::{db::DatabaseAdapter, error::Result, migration::Migration};
 
@@ -144,17 +146,72 @@ impl DatabaseAdapter for PostgresAdapter {
         Ok(())
     }
 
-    fn dump_schema(&mut self, url: &str) -> Result<Vec<u8>> {
-        // Use external pg_dump for schema-only dump
-        let output = Command::new("pg_dump")
-            .arg("--schema-only")
+    fn dump_schema(&mut self, url: &str, exclude_migrations: bool) -> Result<Vec<u8>> {
+        print_pg_dump_version()?;
+
+        let mut cmd = Command::new("pg_dump");
+
+        cmd.arg("--schema-only")
             .arg("--no-owner")
             .arg("--no-privileges")
-            .arg(format!("--dbname={url}"))
-            .output()?;
+            .arg(format!("--dbname={url}"));
 
-        Ok(output.stdout)
+        if exclude_migrations {
+            cmd.arg("--exclude-schema=crude");
+        }
+
+        let output = cmd.output()?;
+
+        Ok(clean_pg_dump_output(output.stdout))
     }
+
+    fn dump_data(&mut self, url: &str, exclude_migrations: bool) -> Result<Vec<u8>> {
+        print_pg_dump_version()?;
+
+        let mut cmd = Command::new("pg_dump");
+
+        cmd.arg("--data-only")
+            .arg("--inserts")
+            .arg("--no-owner")
+            .arg("--no-privileges")
+            .arg(format!("--dbname={url}"));
+
+        if exclude_migrations {
+            cmd.arg("--exclude-schema=crude");
+        }
+
+        let output = cmd.output()?;
+
+        Ok(clean_pg_dump_output(output.stdout))
+    }
+}
+
+/// Clean up pg_dump output to be consistent across environments.
+fn clean_pg_dump_output(output: Vec<u8>) -> Vec<u8> {
+    let input = String::from_utf8_lossy(&output);
+
+    let re_version = Regex::new(r"^-- Dumped by pg_dump version").unwrap();
+    let re_restrict = Regex::new(r"^\\restrict [^[:space:]]+").unwrap();
+    let re_unrestrict = Regex::new(r"^\\unrestrict [^[:space:]]+").unwrap();
+
+    input
+        .lines()
+        .filter(|line| {
+            !re_version.is_match(line)
+                && !re_restrict.is_match(line)
+                && !re_unrestrict.is_match(line)
+        })
+        .collect::<Vec<_>>()
+        .join("\n")
+        .into_bytes()
+}
+
+fn print_pg_dump_version() -> Result<()> {
+    let version = Command::new("pg_dump").arg("--version").output()?;
+
+    warn!("using {}", String::from_utf8_lossy(&version.stdout).trim());
+
+    Ok(())
 }
 
 /// DDL for creating the migrations table in Postgres.
@@ -171,3 +228,49 @@ CREATE TABLE crude.migrations (
     UNIQUE (name)
 );
 ";
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn test_clean_pg_dump_output() {
+        let input = b"\
+-- Dumped by pg_dump version 17.6
+\\restrict somekey
+Normal SQL;
+\\unrestrict somekey
+More SQL;
+";
+        let expected = b"Normal SQL;\nMore SQL;";
+
+        let output = clean_pg_dump_output(input.to_vec());
+        assert_eq!(
+            String::from_utf8_lossy(&output),
+            String::from_utf8_lossy(expected)
+        );
+    }
+
+    #[test]
+    fn test_clean_pg_dump_output_no_matches() {
+        let input = b"Normal SQL;";
+
+        let output = clean_pg_dump_output(input.to_vec());
+        assert_eq!(
+            String::from_utf8_lossy(&output),
+            String::from_utf8_lossy(input)
+        );
+    }
+
+    #[test]
+    fn test_clean_pg_dump_output_only_version() {
+        let input = b"-- Dumped by pg_dump version 15.0\nSQL;\n";
+        let expected = b"SQL;";
+
+        let output = clean_pg_dump_output(input.to_vec());
+        assert_eq!(
+            String::from_utf8_lossy(&output),
+            String::from_utf8_lossy(expected)
+        );
+    }
+}

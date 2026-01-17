@@ -39,7 +39,10 @@ pub trait DatabaseAdapter {
     fn record_baseline(&mut self, name: &str, hash: &str) -> Result<()>;
 
     /// Dump the database schema and return the output.
-    fn dump_schema(&mut self, url: &str) -> Result<Vec<u8>>;
+    fn dump_schema(&mut self, url: &str, exclude_migrations: bool) -> Result<Vec<u8>>;
+
+    /// Dump the database data and return the output.
+    fn dump_data(&mut self, url: &str, exclude_migrations: bool) -> Result<Vec<u8>>;
 }
 
 /// Build a boxed DatabaseAdapter (Postgres or SQLite) based on the URL.
@@ -87,7 +90,7 @@ pub fn get_db_adapter(opts: &Options, wait: bool) -> Result<Box<dyn DatabaseAdap
 pub fn maybe_dump_schema(db: &mut Box<dyn DatabaseAdapter>, opts: &Options) -> Result<()> {
     if let Some(path) = &opts.schema {
         let url = opts.get_url()?;
-        let schema = db.dump_schema(url)?;
+        let schema = db.dump_schema(url, false)?;
 
         write(path, &schema)?;
 
