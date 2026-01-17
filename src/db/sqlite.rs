@@ -154,11 +154,37 @@ impl DatabaseAdapter for SqliteAdapter {
         Ok(())
     }
 
-    fn dump_schema(&mut self, url: &str) -> Result<Vec<u8>> {
+    fn dump_schema(&mut self, url: &str, exclude_migrations: bool) -> Result<Vec<u8>> {
         // SQLite schema via sqlite3 .schema
         let output = Command::new("sqlite3").arg(url).arg(".schema").output()?;
 
-        Ok(output.stdout)
+        if exclude_migrations {
+            let schema = String::from_utf8_lossy(&output.stdout)
+                .lines()
+                .filter(|l| !l.contains("crude_migrations"))
+                .collect::<Vec<_>>()
+                .join("\n");
+
+            Ok(schema.into_bytes())
+        } else {
+            Ok(output.stdout)
+        }
+    }
+
+    fn dump_data(&mut self, url: &str, exclude_migrations: bool) -> Result<Vec<u8>> {
+        let output = Command::new("sqlite3").arg(url).arg(".dump").output()?;
+
+        if exclude_migrations {
+            let data = String::from_utf8_lossy(&output.stdout)
+                .lines()
+                .filter(|l| !l.contains("crude_migrations"))
+                .collect::<Vec<_>>()
+                .join("\n");
+
+            Ok(data.into_bytes())
+        } else {
+            Ok(output.stdout)
+        }
     }
 }
 

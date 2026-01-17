@@ -1,5 +1,3 @@
-use std::process::Command;
-
 use anstream::println;
 use chrono::Utc;
 use clap::Parser;
@@ -44,25 +42,7 @@ impl Rollup {
         let url = opts.get_url()?;
 
         // Dump current schema excluding the migrations table
-        let up_sql = if url.starts_with("postgres://") || url.starts_with("postgresql://") {
-            let out = Command::new("pg_dump")
-                .arg("--schema-only")
-                .arg("--no-owner")
-                .arg("--no-privileges")
-                .arg("--exclude-schema=crude")
-                .arg(format!("--dbname={url}"))
-                .output()?;
-
-            String::from_utf8_lossy(&out.stdout).into_owned()
-        } else {
-            let out = Command::new("sqlite3").arg(url).arg(".schema").output()?;
-
-            String::from_utf8_lossy(&out.stdout)
-                .lines()
-                .filter(|l| !l.contains("crude_migrations"))
-                .collect::<Vec<_>>()
-                .join("\n")
-        };
+        let up_sql = String::from_utf8_lossy(&db.dump_schema(url, true)?).into_owned();
 
         // Build baseline migration
         let ts = Utc::now();
@@ -73,26 +53,7 @@ impl Rollup {
         let hash = hex::encode(hasher.finalize());
 
         // Dump data-only SQL for seed (exclude migrations table)
-        let seed_sql = if url.starts_with("postgres://") || url.starts_with("postgresql://") {
-            let out = Command::new("pg_dump")
-                .arg("--data-only")
-                .arg("--inserts")
-                .arg("--no-owner")
-                .arg("--no-privileges")
-                .arg("--exclude-schema=crude")
-                .arg(format!("--dbname={url}"))
-                .output()?;
-
-            String::from_utf8_lossy(&out.stdout).into_owned()
-        } else {
-            let out = Command::new("sqlite3").arg(url).arg(".dump").output()?;
-
-            String::from_utf8_lossy(&out.stdout)
-                .lines()
-                .filter(|l| !l.contains("crude_migrations"))
-                .collect::<Vec<_>>()
-                .join("\n")
-        };
+        let seed_sql = String::from_utf8_lossy(&db.dump_data(url, true)?).into_owned();
 
         // Create the rollup migration
         migrations_dir.create_migration(&compound_name, Some(&up_sql), Some(&seed_sql))?;
