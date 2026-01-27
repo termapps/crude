@@ -162,6 +162,13 @@ impl DatabaseAdapter for PostgresAdapter {
 
         let output = cmd.output()?;
 
+        if !output.status.success() {
+            return Err(eyre::eyre!(
+                "pg_dump failed: {}",
+                String::from_utf8_lossy(&output.stderr)
+            ));
+        }
+
         Ok(clean_pg_dump_output(output.stdout))
     }
 
@@ -181,6 +188,13 @@ impl DatabaseAdapter for PostgresAdapter {
         }
 
         let output = cmd.output()?;
+
+        if !output.status.success() {
+            return Err(eyre::eyre!(
+                "pg_dump failed: {}",
+                String::from_utf8_lossy(&output.stderr)
+            ));
+        }
 
         Ok(clean_pg_dump_output(output.stdout))
     }

@@ -158,6 +158,13 @@ impl DatabaseAdapter for SqliteAdapter {
         // SQLite schema via sqlite3 .schema
         let output = Command::new("sqlite3").arg(url).arg(".schema").output()?;
 
+        if !output.status.success() {
+            return Err(eyre::eyre!(
+                "sqlite3 .schema failed: {}",
+                String::from_utf8_lossy(&output.stderr)
+            ));
+        }
+
         if exclude_migrations {
             let schema = String::from_utf8_lossy(&output.stdout)
                 .lines()
@@ -173,6 +180,13 @@ impl DatabaseAdapter for SqliteAdapter {
 
     fn dump_data(&mut self, url: &str, exclude_migrations: bool) -> Result<Vec<u8>> {
         let output = Command::new("sqlite3").arg(url).arg(".dump").output()?;
+
+        if !output.status.success() {
+            return Err(eyre::eyre!(
+                "sqlite3 .dump failed: {}",
+                String::from_utf8_lossy(&output.stderr)
+            ));
+        }
 
         if exclude_migrations {
             let data = String::from_utf8_lossy(&output.stdout)
