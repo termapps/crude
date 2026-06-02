@@ -42,7 +42,7 @@ impl Rollup {
         let url = opts.get_url()?;
 
         // Dump current schema excluding the migrations table
-        let up_sql = String::from_utf8_lossy(&db.dump_schema(url, true)?).into_owned();
+        let up_sql = String::from_utf8_lossy(&db.dump_schema(&url, true)?).into_owned();
 
         // Build baseline migration
         let ts = Utc::now();
@@ -53,7 +53,7 @@ impl Rollup {
         let hash = hex::encode(hasher.finalize());
 
         // Dump data-only SQL for seed (exclude migrations table)
-        let seed_sql = String::from_utf8_lossy(&db.dump_data(url, true)?).into_owned();
+        let seed_sql = String::from_utf8_lossy(&db.dump_data(&url, true)?).into_owned();
 
         // Create the rollup migration
         migrations_dir.create_migration(&compound_name, Some(&up_sql), Some(&seed_sql))?;

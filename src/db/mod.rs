@@ -15,6 +15,36 @@ mod sqlite;
 pub use postgres::PostgresAdapter;
 pub use sqlite::SqliteAdapter;
 
+const IGNORED_PARAMS: &[&str] = &["pool_timeout", "connection_limit"];
+
+pub fn strip_non_libpq_params(url: &str) -> String {
+    if !url.starts_with("postgres://") && !url.starts_with("postgresql://") {
+        return url.to_string();
+    }
+
+    let Some(pos) = url.find('?') else {
+        return url.to_string();
+    };
+
+    let (base, query) = url.split_at(pos);
+    let query = &query[1..];
+
+    let params = query
+        .split('&')
+        .filter(|p| {
+            let key = p.split('=').next().unwrap_or("");
+
+            !IGNORED_PARAMS.contains(&key)
+        })
+        .collect::<Vec<_>>();
+
+    if params.is_empty() {
+        base.to_string()
+    } else {
+        format!("{}?{}", base, params.join("&"))
+    }
+}
+
 /// Trait that defines database operations for migrations.
 pub trait DatabaseAdapter {
     /// SQL to initialize the migrations tracking table.
@@ -56,9 +86,9 @@ pub fn get_db_adapter(opts: &Options, wait: bool) -> Result<Box<dyn DatabaseAdap
 
         let client = loop {
             let client = if url.contains("sslmode=require") {
-                Client::connect(url, tls.clone())
+                Client::connect(&url, tls.clone())
             } else {
-                Client::connect(url, NoTls)
+                Client::connect(&url, NoTls)
             };
 
             match client {
@@ -90,7 +120,7 @@ pub fn get_db_adapter(opts: &Options, wait: bool) -> Result<Box<dyn DatabaseAdap
 pub fn maybe_dump_schema(db: &mut Box<dyn DatabaseAdapter>, opts: &Options) -> Result<()> {
     if let Some(path) = &opts.schema {
         let url = opts.get_url()?;
-        let schema = db.dump_schema(url, false)?;
+        let schema = db.dump_schema(&url, false)?;
 
         write(path, &schema)?;
 
@@ -98,4 +128,85 @@ pub fn maybe_dump_schema(db: &mut Box<dyn DatabaseAdapter>, opts: &Options) -> R
     }
 
     Ok(())
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn strip_no_query() {
+        assert_eq!(
+            strip_non_libpq_params("postgres://user@host/db"),
+            "postgres://user@host/db"
+        );
+    }
+
+    #[test]
+    fn strip_all_params_removed() {
+        assert_eq!(
+            strip_non_libpq_params("postgres://user@host/db?pool_timeout=30"),
+            "postgres://user@host/db"
+        );
+    }
+
+    #[test]
+    fn strip_first_param() {
+        assert_eq!(
+            strip_non_libpq_params("postgres://user@host/db?pool_timeout=30&sslmode=require"),
+            "postgres://user@host/db?sslmode=require"
+        );
+    }
+
+    #[test]
+    fn strip_last_param() {
+        assert_eq!(
+            strip_non_libpq_params("postgres://user@host/db?sslmode=require&pool_timeout=30"),
+            "postgres://user@host/db?sslmode=require"
+        );
+    }
+
+    #[test]
+    fn strip_middle_param() {
+        assert_eq!(
+            strip_non_libpq_params(
+                "postgres://user@host/db?sslmode=require&pool_timeout=30&connect_timeout=5"
+            ),
+            "postgres://user@host/db?sslmode=require&connect_timeout=5"
+        );
+    }
+
+    #[test]
+    fn strip_no_unknown_params() {
+        assert_eq!(
+            strip_non_libpq_params("postgres://user@host/db?sslmode=require"),
+            "postgres://user@host/db?sslmode=require"
+        );
+    }
+
+    #[test]
+    fn strip_multiple_unknown() {
+        assert_eq!(
+            strip_non_libpq_params(
+                "postgres://user@host/db?pool_timeout=30&connection_limit=5&sslmode=require"
+            ),
+            "postgres://user@host/db?sslmode=require"
+        );
+    }
+
+    #[test]
+    fn strip_sqlite_unchanged() {
+        assert_eq!(
+            strip_non_libpq_params("sqlite://db.sqlite3?pool_timeout=30"),
+            "sqlite://db.sqlite3?pool_timeout=30"
+        );
+    }
+
+    #[test]
+    fn strip_postgresql_prefix() {
+        assert_eq!(
+            strip_non_libpq_params("postgresql://user@host/db?pool_timeout=30"),
+            "postgresql://user@host/db"
+        );
+    }
 }

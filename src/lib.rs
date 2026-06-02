@@ -7,6 +7,7 @@ use proc_exit::Code;
 
 use crate::{
     commands::Subcommands,
+    db::strip_non_libpq_params,
     error::{Result, exit},
 };
 
@@ -76,9 +77,9 @@ impl App {
 
 impl Options {
     /// Get the database URL or error out if not provided
-    pub fn get_url(&self) -> Result<&str> {
+    pub fn get_url(&self) -> Result<String> {
         if let Some(url) = self.url.as_ref() {
-            return Ok(url);
+            return Ok(strip_non_libpq_params(url));
         }
 
         eprintln!(
