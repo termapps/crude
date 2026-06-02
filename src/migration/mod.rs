@@ -43,7 +43,7 @@ impl Migration {
     }
 
     /// Load a local migration from a directory.
-    pub fn from_dir(path: &Path) -> Result<Self> {
+    pub fn from_dir(path: &Path) -> Result<Option<Self>> {
         let compound_name = path
             .file_name()
             .and_then(|n| n.to_str())
@@ -53,8 +53,10 @@ impl Migration {
         let (name, _) = Self::from_compound_name(&compound_name)?;
 
         let up_path = path.join("up.sql");
-        let up_sql = read_to_string(&up_path)
-            .map_err(|e| eyre!("unable to read migration {}: {}", up_path.display(), e))?;
+
+        let Ok(up_sql) = read_to_string(&up_path) else {
+            return Ok(None);
+        };
 
         let mut hasher = Sha256::new();
         hasher.update(up_sql.as_bytes());
@@ -68,14 +70,14 @@ impl Migration {
             .ok()
             .filter(|s| !s.is_empty());
 
-        Ok(Migration {
+        Ok(Some(Migration {
             name,
             compound_name,
             up_sql: Some(up_sql),
             down_sql,
             seed_sql,
             hash,
-        })
+        }))
     }
 
     /// Construct a migration record from database metadata.

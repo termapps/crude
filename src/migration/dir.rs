@@ -66,8 +66,9 @@ impl MigrationsDir {
         dirs.sort_by_key(|e| e.file_name());
 
         for entry in dirs {
-            let mig = Migration::from_dir(&entry.path())?;
-            migrations.push(mig);
+            if let Some(mig) = Migration::from_dir(&entry.path())? {
+                migrations.push(mig);
+            }
         }
 
         Ok(migrations)

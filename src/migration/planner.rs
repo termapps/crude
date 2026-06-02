@@ -10,10 +10,10 @@ use eyre::eyre;
 use owo_colors::OwoColorize;
 
 use crate::{
-    Options,
-    db::{DatabaseAdapter, get_db_adapter},
+    db::{get_db_adapter, DatabaseAdapter},
     error::Result,
-    migration::{Migration, dir::get_migrations_dir},
+    migration::{dir::get_migrations_dir, Migration},
+    Options,
 };
 
 /// The state of a migration when comparing local vs. database.
